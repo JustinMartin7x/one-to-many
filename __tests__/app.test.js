@@ -9,6 +9,7 @@ const pool = require('../lib/utils/pool');
 
 
 
+
 describe('app end point', () => {
   beforeAll(() => {
     return pool.query(fs.readFileSync(`${__dirname}/../sql/setupSQL.sql`, 'utf-8'));
@@ -33,12 +34,43 @@ describe('app end point', () => {
       genre: 'LitRPG'
     });
   });
+
+
+
   it ('finds an author by id via Get', async() => {
-    const author = await Authors.create({ name: 'Richard Dawkins', books: 'The God Delusion', genre: 'non-fic' });
+
+    const author = await Authors.create(
+      {
+        name: 'Richard Dawkins',
+        books: 'The God Delusion',
+        genre: 'non-fic'
+      });
+
+    const books = await Promise.all([
+      {
+        title: 'hello world',
+        author_id: author.id
+      },
+      {
+        title: 'am i done yet',
+        author_id: author.id
+      }
+    ].map(books => Books.create(books)));
+  
+
     const response = await request(app)
       .get(`/authors/${author.id}`);
-    expect(response.body).toEqual(author);
+
+
+    expect(response.body).toEqual({
+      ...author,
+      books });
   });
+
+
+
+
+
   it ('updates an Author by using id and PUT', async() => {
     const author = await Authors.create({ name: 'Aleron Kong', books: 'The Land, Gods Eye', genre: 'LITRPG GNOMES RULE!' });
     const response = await request(app)
@@ -70,7 +102,7 @@ describe('app end point', () => {
         author_id: 1
       });
     expect(res.body).toEqual({
-      id: '1',
+      id: '3',
       title: 'the land',
       author_id: '1'
     });
