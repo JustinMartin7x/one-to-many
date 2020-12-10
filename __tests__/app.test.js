@@ -85,7 +85,6 @@ describe('app end point', () => {
     expect(res.body).toEqual(book);
   });
 
-
   it ('should update a book by ID and PUT route', async() => {
     const author = await Authors.create({ name: 'tom riddle', books: 'fail army', genre: 'fiction' });
     const book = await Books.create({ title: 'fubar', author_id: author.id }); 
